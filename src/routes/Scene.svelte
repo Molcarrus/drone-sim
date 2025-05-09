@@ -1,51 +1,16 @@
 <script>
-  import { T, useTask } from '@threlte/core'
-  import { interactivity } from '@threlte/extras';
-  import { Spring } from 'svelte/motion';
-    import { DirectionalLight, PerspectiveCamera } from 'three';
+    import { T } from '@threlte/core'
+    import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+    import { useLoader } from '@threlte/core'
+    import { useGltf } from '@threlte/extras'
 
-  interactivity()
-  const scale = new Spring(1)
-
-  let rotation = 0
-  useTask((delta) => {
-    rotation += delta
-  })
+    const gltf = useLoader(GLTFLoader).load('src/assets/drone.gltf')
 </script>
 
-<T.PerspectiveCamera
-    makeDefault
-    position={[10,10,10]}
-    oncreate={(ref) => {
-        ref.lookAt(0,1,0)
-    }}
-/>
+{#if $gltf}
+    <T is={($gltf).scene} />
+{/if}
 
-<T.DirectionalLight 
-    position={[0,10,10]}
-    castShadow 
-/>
-
-<T.Mesh 
-    rotation.y={rotation}
-    position.y={1}
-    scale={scale.current}
-    onpointerenter={() => {
-        scale.target = 1.5
-    }}
-    onpointerleave={() => {
-        scale.target = 1
-    }}
-    castShadow
->
-<T.BoxGeometry args={[1, 2,1]} />
-<T.MeshBasicMaterial color="hotpink"/>
-</T.Mesh>
-
-<T.Mesh
-    rotation.x={-Math.PI/2}
-    receiveShadow
->
-    <T.CircleGeometry args={[4,40]} />
-    <T.MeshStandardMaterial color="white" />
-</T.Mesh>
+<!-- {#await useGltf('/src/assets/scene.gltf') then gltf}
+    <T is={gltf.scene} />
+{/await} -->
