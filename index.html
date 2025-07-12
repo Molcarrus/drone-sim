@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blockly Simulator</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed"></script>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/"
+            }
+        }
+    </script>
+    
+    <!-- code preview -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <!--  -->
+    <script type="module" src="script.js"></script>
+
+    <style>
+      body {
+        display: flex;
+        height: 100vh;
+      }
+      #blocklyDiv {
+        height: 100%;
+        width: 70%;
+      }
+      #divider {
+        width: 5px;
+        cursor: ew-resize;
+        background-color: #aaa;
+      }
+      #dividerh {
+        width: 100%;
+        height: 5px;
+        cursor: ns-resize;
+        background-color: #aaa;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="blocklyDiv" style="width: 100%;"></div>
+    <div id="divider"></div>
+    <div id="rightColumn">
+      <div id="simulator">
+        <h3>3D Simulator</h3>
+        <button id="runButton">Run</button>
+        <div id="simulatorContainer"></div>
+      </div>
+      <div id="dividerh"></div>
+      <div id="codeOutput">
+        <h3>Live Code</h3>
+        <pre id="generatedCode"></pre>
+      </div>
+    </div>
+    <xml id="toolbox" style="display: none">
+      <category name="Movement">
+        <block type="takeoff"></block>
+        <block type="fly"></block>
+        <block type="circle"></block>
+        <block type="yaw"></block>
+        <block type="land"></block>
+      </category>
+      <category name="Control">
+        <block type="controls_if"></block>
+      </category>
+      <category name="Logic">
+        <block type="logic_compare"></block>
+        <block type="logic_operation"></block>
+        <block type="logic_boolean"></block>
+      </category>
+    </xml>
+
+    <script type="module" src="./simulator.js"></script>
+    <script>
+      // Initialize Blockly
+      function initBlockly() {
+        const blocklyDiv = document.getElementById('blocklyDiv');
+        const divider = document.getElementById('divider');
+        const rightColumn = document.getElementById('rightColumn');
+        
+        let isResizing = null;
+
+        divider.addEventListener('mousedown', () => {
+          isResizing = 'horizontal';
+          document.body.style.cursor = 'ew-resize';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+          if (!isResizing) return;
+
+          if (isResizing === 'horizontal') {
+            const newWidth = (e.clientX / window.innerWidth) * 100;
+            if (newWidth > 10 && newWidth < 90) {
+              blocklyDiv.style.width = `${newWidth}%`;
+              rightColumn.style.width = `${100 - newWidth}%`;
+              if (window.workspace) {
+                Blockly.svgResize(window.workspace);
+              }
+            }
+          }
+        });
+
+        window.addEventListener('mouseup', () => {
+          isResizing = null;
+          document.body.style.cursor = 'default';
+        });
+      }
+
+      // Initialize everything when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        initBlockly();
+      });
+    </script>
+  </body>
+</html>
