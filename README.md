@@ -1,1 +1,1 @@
-[](https://github.com/Molcarrus/drone-sim/demo/demo.mp4)
+https://raw.githubusercontent.com/Molcarrus/drone-sim/main/demo/demo.mp4
